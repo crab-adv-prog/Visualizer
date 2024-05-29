@@ -7,6 +7,7 @@ mod tilemap_plugin;
 mod camera_plugin;
 
 fn main() {
+    //TODO La mappa viene girata e la spawna solo se rettangolare. Non so se sia un problema di spawnare le cose con la stringa o succede anche con la matrix
     let map_string = "
         DDDDDDDDDDDDDDDDDDDDD
         DWWWWWWWWWWWWWWWWWWWD
