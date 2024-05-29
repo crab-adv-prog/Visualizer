@@ -934,6 +934,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_pancam"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0fc188c00741b4e7736cf1ba8e394abce7daf479284f5ca551408d36147c7bd"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4393,6 +4402,7 @@ name = "robot"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_pancam",
  "bob_lib",
  "ghost_journey_journal",
  "ohcrab_weather",
