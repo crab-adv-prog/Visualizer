@@ -61,6 +61,5 @@ fn main() {
         }
         map.push(row);
     }
-    //let map = vec![vec![Tile {tile_type: TileType::Grass, content: Content::None, elevation: 0}; 5]; 7];
     visualizer::start(map.clone());
 }
