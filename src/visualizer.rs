@@ -27,10 +27,10 @@ pub(crate) struct CacheForRobot { pub(crate) cache: Arc<Mutex<Cache>> }
 #[derive(Resource, Default)]
 pub(crate) struct TileSize { pub(crate) tile_size: f32 }
 
-pub(crate) fn start(map: Arc<Mutex<Vec<Vec<Tile>>>>, cache: Arc<Mutex<Cache>>) {
+pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>) {
 
-    let map_created = map.lock().unwrap().clone();
-    let map_resource = Map { map: map_created };
+    //let map_created = map.lock().unwrap().clone();
+    let map_resource = Map { map: map };
 
     let cache_resource = CacheForRobot { cache };
 
