@@ -56,36 +56,73 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        println!("spawn_robot 0,0");
-        cache.add_record(Action::Other("spawn_robot".to_string()), (25, 25));
+        let command = "spawn_robot_with_id 1".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23, 25));
     }
 
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        println!("move_robot 1,0");
-        cache.add_record(Action::Other("move_robot 26 25".to_string()), (25,25));
+        let command = "spawn_robot_with_id 2".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (27,25));
     }
 
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        println!("move_robot 2,0");
-        cache.add_record(Action::Other("move_robot 27 25".to_string()), (26,25));
+        let command  = "move_robot_multiple 1 23 26".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23,25));
     }
 
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        println!("move_robot 2,1");
-        cache.add_record(Action::Other("move_robot 27 26".to_string()), (27,25));
+        let command = "move_robot_multiple 2 27 26".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (27,25));
     }
 
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        println!("move_robot 2,2");
-        cache.add_record(Action::Other("move_robot 27 27".to_string()), (27,26));
+        let command = "move_robot_multiple 1 23 27".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23,26));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "move_robot_multiple 2 27 27".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (27,26));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "spawn_robot".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (25,25));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "move_robot 25 24".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (25,25));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "move_robot 25 23".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (25,24));
     }
 
 }

@@ -1,4 +1,5 @@
 use bevy::asset::AssetContainer;
+use bevy::ecs::query::QuerySingleError;
 use bevy::prelude::*;
 use rstykrab_cache::Action;
 
@@ -45,56 +46,32 @@ fn spawn_robot(
 
     robot.custom_size = Some(Vec2::splat(tile_size));
 
+    let robot_name = "Robot_".to_string() + &*id.to_string();
+
     let robot = commands.spawn((SpriteSheetBundle {
         texture_atlas: sprite.0.clone(),
         sprite: robot,
         transform: Transform::from_xyz(robot_position.0, robot_position.1, 1.0),
         ..Default::default()
-    }, Name::new("Robot"), Robot, ID{id}));
+    }, Name::new(robot_name), Robot, ID{id}));
 
 }
 
-fn move_robot(
-    mut robot_query: &mut Query<(&Robot, &mut Transform)>,
+fn move_robot_with_id(
+    mut robot_query: &mut Query<(&Robot, &mut Transform, Option<&ID>)>,
     new_position: &(u32, u32),
+    id: &i32,
     tile_size: &Res<TileSize>
 ){
-    match robot_query.get_single_mut() {
-        Ok((robot, mut position)) => {
+    for (_, mut position_iter, id_iter) in robot_query{
+        if(*id == id_iter.unwrap().id){
             let tile_size = tile_size.as_ref().tile_size;
             let x = new_position.0 as f32 * tile_size;
             let y = new_position.1 as f32 * tile_size;
 
-            *position = Transform::from_xyz(x, y, 1.0);
-        }
-        Err(e) => {
-            println!("Errore durante la chiamata a get_single_mut(): {}", e);
-
+            *position_iter = Transform::from_xyz(x, y, 1.0);
         }
     }
-}
-
-fn move_robot_multiple(
-    mut robot_query: &mut Query<(&Robot, &mut Transform)>,
-    new_position: &(u32, u32),
-    tile_size: &Res<TileSize>
-){
-    /*for robot in robot_query{
-
-    }
-    match robot_query.get_many_mut() {
-        Ok((robot, mut position)) => {
-            let tile_size = tile_size.as_ref().tile_size;
-            let x = new_position.0 as f32 * tile_size;
-            let y = new_position.1 as f32 * tile_size;
-
-            *position = Transform::from_xyz(x, y, 1.0);
-        }
-        Err(e) => {
-            println!("Errore durante la chiamata a get_single_mut(): {}", e);
-
-        }
-    }*/
 }
 
 fn robot(
@@ -104,7 +81,7 @@ fn robot(
     mut commands: Commands,
     sprite: Res<visualizer::SpriteSheetRust>,
     tile_size: Res<TileSize>,
-    mut robot_query: Query<(&Robot, &mut Transform)>,
+    mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
 ) {
     timer.timer.tick(time.delta());
 
@@ -126,12 +103,13 @@ fn robot(
                             "move_robot" => {
                                 let x: u32 = record_string[1].parse().unwrap();
                                 let y: u32 = record_string[2].parse().unwrap();
-                                move_robot( &mut robot_query, &(x,y), &tile_size)
+                                move_robot_with_id( &mut robot_query, &(x,y), &0, &tile_size)
                             }
                             "move_robot_multiple" => {
-                                let x: u32 = record_string[1].parse().unwrap();
-                                let y: u32 = record_string[2].parse().unwrap();
-                                move_robot( &mut robot_query, &(x,y), &tile_size)
+                                let id: i32 = record_string[1].parse().unwrap();
+                                let x: u32 = record_string[2].parse().unwrap();
+                                let y: u32 = record_string[3].parse().unwrap();
+                                move_robot_with_id(&mut robot_query, &(x, y), &id, &tile_size)
                             }
                             "destroy_content" => {}
                             _ => {}
@@ -141,9 +119,10 @@ fn robot(
                 }
             }
             history.set_size(0);
-            history.set_size(10);
+            history.set_size(25);
         } else {
             println!("Error: Invalid count specified");
         }
     }
 }
+
