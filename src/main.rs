@@ -12,16 +12,19 @@ mod tilemap_plugin;
 mod camera_plugin;
 
 fn main() {
+    ///Punto 1
     let mut map_creation = WorldgeneratorUnwrap::init(false, Some(PathBuf::from("./assets/maps/map4"))).gen().0;
     let map = Arc::new(Mutex::new(map_creation));
 
+    ///Punto 2
     let cache_creation = Cache::new(25);
     let cache = Arc::new(Mutex::new(cache_creation));
 
+    ///Punto 3
     let visulizer_map = Arc::clone(&map);
-    let fun_map = Arc::clone(&map);
-
     let visualizer_cache = Arc::clone(&cache);
+
+    let fun_map = Arc::clone(&map);
     let fun_cache = Arc::clone(&cache);
 
 
@@ -31,6 +34,10 @@ fn main() {
     });
 
     println!("Starting visualizer");
+    ///Per far partire il visualizer, assicurarsi di avere un Arc<Mutex<>> sia della mappa che della cache(Punto 1 e 2).
+    /// Successivamente clonarli(Punto 3) e passarli al visualizer
+    /// La mappa clonarla (non ricordo perchè lo ho fatto e dovrebbe funzionare anche senza il clone, ma tanto non viene mai cambiato dopo l'init dal punto di vista del visualizer)
+    /// E' necessario metterlo come ultima parte fatta partire, e assicurarsi che tutto il resto (come il cache_usage nell'esempio), siano dentro thread separati
     visualizer::start(visulizer_map.clone(), visualizer_cache);
 }
 
