@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+winit = "0.30.0"
 bevy_pancam = "0.10.0"
 bevy = { version = "0.12.1"}
 robotics_lib = {version= "0.1.21", registry = "kellnr" }

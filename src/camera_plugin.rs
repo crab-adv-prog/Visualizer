@@ -1,10 +1,6 @@
-use bevy::input::mouse::{MouseButtonInput, MouseMotion};
 use bevy::prelude::*;
-use bevy::utils::petgraph::data::Element;
-use robotics_lib::world::tile::TileType;
-use crate::visualizer;
-use bevy::input::*;
 use bevy_pancam::{PanCam, PanCamPlugin};
+
 use crate::visualizer::{Map, TileSize};
 
 pub(crate) struct CameraPluginCustom;

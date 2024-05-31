@@ -1,6 +1,6 @@
-use std::ops::Index;
 use bevy::prelude::*;
 use robotics_lib::world::tile::{Content, TileType};
+
 use crate::visualizer;
 use crate::visualizer::{Map, TileSize};
 

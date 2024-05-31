@@ -1,6 +1,8 @@
+use std::sync::{Arc, Mutex};
 use bevy::prelude::*;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
 use robotics_lib::world::tile::Tile;
+use rstykrab_cache::Cache;
 use crate::camera_plugin::CameraPluginCustom;
 
 use crate::robot_plugin::RobotPlugin;
@@ -19,17 +21,25 @@ pub(crate) struct SpriteSheetRust(pub(crate) Handle<TextureAtlas>);
 #[derive(Resource, Default)]
 pub(crate) struct Map { pub(crate) map: Vec<Vec<Tile>> }
 
+#[derive(Resource)]
+pub(crate) struct CacheForRobot { pub(crate) cache: Arc<Mutex<Cache>> }
+
 #[derive(Resource, Default)]
 pub(crate) struct TileSize { pub(crate) tile_size: f32 }
 
-pub(crate) fn start(map: Vec<Vec<Tile>>) {
+pub(crate) fn start(map: Arc<Mutex<Vec<Vec<Tile>>>>, cache: Arc<Mutex<Cache>>) {
 
-    let map_resource = Map { map };
+    let map_created = map.lock().unwrap().clone();
+    let map_resource = Map { map: map_created };
+
+    let cache_resource = CacheForRobot { cache };
+
     let tile_size_resource = TileSize { tile_size: TILE_SIZE };
 
     App::new()
         .insert_resource(tile_size_resource)
         .insert_resource(map_resource)
+        .insert_resource(cache_resource)
         .insert_resource(ClearColor(CLEAR))
         .add_systems(PreStartup, assets)
         .add_plugins(CameraPluginCustom)
