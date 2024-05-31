@@ -104,6 +104,14 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
     sleep(std::time::Duration::from_secs(timer_time));
     {
         let mut cache = cache.lock().unwrap();
+        let command = "destroy_content".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (27,28));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
         let command = "spawn_robot".to_string();
         println!("{}", command);
         cache.add_record(Action::Other(command), (25,25));

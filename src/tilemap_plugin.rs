@@ -6,6 +6,11 @@ use crate::visualizer::{Map, TileSize};
 
 pub(crate) struct TileMapPlugin;
 
+#[derive(Component)]
+pub(crate) struct ContentTile{
+    pub(crate) position: (u32, u32)
+}
+
 impl Plugin for TileMapPlugin{
     fn build(&self, app: &mut App) {
         app
@@ -71,12 +76,12 @@ fn create_content(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRus
                 Content::None => {TextureAtlasSprite::new(27)}
             };
             imageTile.custom_size = Some(Vec2::splat(tile_size));
-            commands.spawn(SpriteSheetBundle {
+            commands.spawn((SpriteSheetBundle {
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
                 transform: Transform::from_xyz((i as f32) * tile_size, (j as f32) * tile_size, -1.0),
                 ..Default::default()
-            });
+            }, ContentTile{ position: (i as u32, j as u32)} ));
         }
     }
 }

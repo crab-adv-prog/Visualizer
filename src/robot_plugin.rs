@@ -1,7 +1,9 @@
 use bevy::asset::AssetContainer;
+use bevy::ecs::bundle::DynamicBundle;
 use bevy::ecs::query::QuerySingleError;
 use bevy::prelude::*;
 use rstykrab_cache::Action;
+use crate::tilemap_plugin::ContentTile;
 
 use crate::visualizer;
 use crate::visualizer::{CacheForRobot, TileSize};
@@ -74,6 +76,20 @@ fn move_robot_with_id(
     }
 }
 
+fn remove_content(
+    mut robot_query: &mut Query<(&ContentTile, &mut Visibility)>,
+    position_to_remove: &(usize, usize),
+    tile_size: &Res<TileSize>
+){
+     for (content_tile, mut visibility) in robot_query {
+         let x_check = (content_tile.position.0 as usize == position_to_remove.0);
+         let y_check = (content_tile.position.1 as usize == position_to_remove.1);
+        if(x_check && y_check){
+            *visibility = Visibility::Hidden
+        }
+    }
+}
+
 fn robot(
     mut timer: ResMut<TimerCache>,
     time: Res<Time>,
@@ -82,6 +98,7 @@ fn robot(
     sprite: Res<visualizer::SpriteSheetRust>,
     tile_size: Res<TileSize>,
     mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
+    mut content_query: Query<(&ContentTile, &mut Visibility)>,
 ) {
     timer.timer.tick(time.delta());
 
@@ -111,7 +128,7 @@ fn robot(
                                 let y: u32 = record_string[3].parse().unwrap();
                                 move_robot_with_id(&mut robot_query, &(x, y), &id, &tile_size)
                             }
-                            "destroy_content" => {}
+                            "destroy_content" => { remove_content(&mut content_query, &record.position, &tile_size)}
                             _ => {}
                         }
                     }
