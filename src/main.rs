@@ -22,8 +22,9 @@ fn main() {
     /// cache.add_record("spawn_robot", (x,y)), per spawnare un robot in (x,y)
     /// cache.add_record("spawn_robot_with_id A", (x,y)), per spawnare un robot in (x,y) con id A
     /// cache.add_record("move_robot x1 y1", (x,y)), per muovere il robot da (x,y) a (x1,y1)
-    /// cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1) [Serve per differenziare facilmente il caso di un robot o più]
+    /// cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
     /// cache.add_record("destroy_content", (x,y)), per rimuovere il content in (x,y)
+    /// cache.add_record("explore_map x1 y1 x2 y2", (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
     let cache_creation = Cache::new(25);
     let cache = Arc::new(Mutex::new(cache_creation));
 
@@ -52,6 +53,31 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
 
     println!("I am using the cache, yippie!");
     let timer_time = 1;
+
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "explore_map 20 20 30 30".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23, 25));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "explore_map 10 10 25 25".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23, 25));
+    }
+
+    sleep(std::time::Duration::from_secs(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "explore_map 31 31 31 31".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (23, 25));
+    }
 
     sleep(std::time::Duration::from_secs(timer_time));
     {

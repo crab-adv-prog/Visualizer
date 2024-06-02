@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::reflect::erased_serde::__private::serde::de::Unexpected::Option;
 use robotics_lib::world::tile::{Content, TileType};
 
 use crate::visualizer;
@@ -7,8 +8,9 @@ use crate::visualizer::{Map, TileSize};
 pub(crate) struct TileMapPlugin;
 
 #[derive(Component)]
-pub(crate) struct ContentTile{
-    pub(crate) position: (u32, u32)
+pub(crate) struct Explorable{
+    pub(crate) position: (u32, u32),
+    pub(crate) isContent: bool
 }
 
 impl Plugin for TileMapPlugin{
@@ -39,12 +41,18 @@ fn create_map(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRust>, 
                 TileType::Teleport(_) => {TextureAtlasSprite::new(9)}
                 TileType::Wall => { TextureAtlasSprite::new(10)} };
             imageTile.custom_size = Some(Vec2::splat(tile_size));
-            commands.spawn(SpriteSheetBundle {
+            commands.spawn((SpriteSheetBundle {
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
                 transform: Transform::from_xyz((i as f32) * tile_size, (j as f32) * tile_size, -2.0),
+                visibility: Visibility::Hidden,
                 ..Default::default()
-            });
+            },
+                Explorable {
+                    position: (i as u32, j as u32),
+                    isContent: false
+                }
+            ));
         }
     }
 }
@@ -80,8 +88,13 @@ fn create_content(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRus
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
                 transform: Transform::from_xyz((i as f32) * tile_size, (j as f32) * tile_size, -1.0),
+                visibility: Visibility::Hidden,
                 ..Default::default()
-            }, ContentTile{ position: (i as u32, j as u32)} ));
+            },
+            Explorable {
+                position: (i as u32, j as u32),
+                isContent: true
+            }));
         }
     }
 }

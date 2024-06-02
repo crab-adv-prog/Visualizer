@@ -3,7 +3,7 @@ use bevy::ecs::bundle::DynamicBundle;
 use bevy::ecs::query::QuerySingleError;
 use bevy::prelude::*;
 use rstykrab_cache::Action;
-use crate::tilemap_plugin::ContentTile;
+use crate::tilemap_plugin::{Explorable};
 
 use crate::visualizer;
 use crate::visualizer::{CacheForRobot, TileSize};
@@ -77,15 +77,38 @@ fn move_robot_with_id(
 }
 
 fn remove_content(
-    mut robot_query: &mut Query<(&ContentTile, &mut Visibility)>,
-    position_to_remove: &(usize, usize),
-    tile_size: &Res<TileSize>
+    mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
+    position_to_remove: &(usize, usize)
 ){
      for (content_tile, mut visibility) in robot_query {
          let x_check = (content_tile.position.0 as usize == position_to_remove.0);
          let y_check = (content_tile.position.1 as usize == position_to_remove.1);
-        if(x_check && y_check){
+        if(x_check && y_check && content_tile.isContent){
             *visibility = Visibility::Hidden
+        }
+    }
+}
+
+fn explore_tile(
+    mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
+    left_bottom_angle: &(usize, usize),
+    right_top_angle: &(usize, usize)
+){
+    for (content_tile, mut visibility) in robot_query {
+        let high_x_check = (content_tile.position.0 as usize >= left_bottom_angle.0);
+        let high_y_check = (content_tile.position.1 as usize >= left_bottom_angle.1);
+        let right_top_check = high_x_check && high_y_check;
+
+        let low_x_check = (content_tile.position.0 as usize <= right_top_angle.0);
+        let low_y_check = (content_tile.position.1 as usize <= right_top_angle.1);
+        let left_bottom_check = low_x_check && low_y_check;
+
+        if(right_top_check || left_bottom_check){
+            println!("x: {}, y: {}, is_in_top_right: {}, is_in_bottom_left: {}", content_tile.position.0, content_tile.position.1, right_top_check, left_bottom_check)
+        }
+
+        if(right_top_check && left_bottom_check){
+            *visibility = Visibility::Visible
         }
     }
 }
@@ -98,16 +121,17 @@ fn robot(
     sprite: Res<visualizer::SpriteSheetRust>,
     tile_size: Res<TileSize>,
     mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
-    mut content_query: Query<(&ContentTile, &mut Visibility)>,
+    mut content_query: Query<(&Explorable, &mut Visibility)>,
 ) {
     timer.timer.tick(time.delta());
 
     if timer.timer.finished() {
+        println!("Explore map");
         let mut history = cache.as_ref().cache.lock().unwrap();
         if let Ok(mut recent_actions) = history.get_recent_actions(5) {
             recent_actions.reverse();
             for record in recent_actions {
-                println!("Action is:  {:?}", record);
+                println!("Action in explore_map is:  {:?}", record);
                 match &record.action {
                     Action::Other(record_string) => {
                         let record_string: Vec<&str> = record_string.split(' ').collect();
@@ -128,13 +152,18 @@ fn robot(
                                 let y: u32 = record_string[3].parse().unwrap();
                                 move_robot_with_id(&mut robot_query, &(x, y), &id, &tile_size)
                             }
-                            "destroy_content" => { remove_content(&mut content_query, &record.position, &tile_size)}
+                            "destroy_content" => { remove_content(&mut content_query, &record.position)}
+                            "explore_map" => {
+                                let right_top: (usize, usize) = (record_string[1].parse().unwrap(), record_string[2].parse().unwrap());
+                                let left_top: (usize, usize) = (record_string[3].parse().unwrap(), record_string[4].parse().unwrap());
+                                explore_tile(&mut content_query, &right_top, &left_top)}
                             _ => {}
                         }
                     }
                     _ => {}
                 }
             }
+
             history.set_size(0);
             history.set_size(25);
         } else {
