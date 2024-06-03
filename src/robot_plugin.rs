@@ -3,6 +3,7 @@ use bevy::asset::AssetContainer;
 use bevy::ecs::bundle::DynamicBundle;
 use bevy::ecs::query::QuerySingleError;
 use bevy::prelude::*;
+use bevy_inspector_egui::__macro_exports::bevy_reflect::{TypeRegistry, TypeRegistryArc};
 use rstykrab_cache::Action;
 use crate::tilemap_plugin::{Explorable};
 
@@ -18,9 +19,9 @@ struct TimerCache {
 #[derive(Component)]
 struct Robot;
 
-#[derive(Component)]
-struct ID{
-    id: i32
+#[derive(Component, Debug, Reflect)]
+pub (crate) struct ID{
+    pub (crate) id: i32
 }
 
 const SLEEP_TIME_MILLIS: u64 = 1;
@@ -68,7 +69,9 @@ fn move_robot_with_id(
 ){
     println!("Moving robot {} to {:?}", id, new_position);
     for (_, mut position_iter, id_iter) in robot_query{
+        println!("Robot in pos {:?} and id {:?}", position_iter, id_iter);
         if(*id == id_iter.unwrap().id){
+            println!("Found the robot with id {}. Moving it to {:?}", id, new_position);
             let tile_size = tile_size.as_ref().tile_size;
             let x = new_position.0 as f32 * tile_size;
             let y = new_position.1 as f32 * tile_size;
@@ -167,4 +170,3 @@ fn robot(
             println!("Error: Invalid count specified");
         }
 }
-

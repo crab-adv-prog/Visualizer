@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 use bevy::prelude::*;
+use bevy::reflect::TypeRegistryArc;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
 use robotics_lib::runner::Runner;
 use robotics_lib::utils::LibError;
@@ -9,6 +10,7 @@ use robotics_lib::world::tile::Tile;
 use rstykrab_cache::Cache;
 use winit::platform::x11::XVisualID;
 use crate::camera_plugin::CameraPluginCustom;
+use crate::devy_debug_plugin::DebugPlugin;
 
 use crate::robot_plugin::RobotPlugin;
 use crate::tilemap_plugin::TileMapPlugin;
@@ -88,6 +90,7 @@ pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: u
         .add_plugins(CameraPluginCustom)
         .add_plugins(TileMapPlugin)
         .add_plugins(RobotPlugin)
+        .add_plugins(DebugPlugin)
         .run();
 }
 
@@ -108,12 +111,13 @@ fn assets(mut commands: Commands, assets: Res<AssetServer>, mut atlas: ResMut<As
 
 fn run_game(mut runner: NonSendMut<RobotRunnable>, mut tick_controller: ResMut<Ticks>){
 
-    if(tick_controller.tick_amount > tick_controller.current_ticks) {
-        sleep(Duration::from_secs(5));
+    if(tick_controller.tick_amount == -1 || tick_controller.tick_amount > tick_controller.current_ticks) {
+        //sleep(Duration::from_secs(5));
         let mut res = Err(LibError::NoContent);
         res = runner.runner.as_mut().unwrap().game_tick();
     }
     tick_controller.current_ticks += 1;
 }
+
 
 

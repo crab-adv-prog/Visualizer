@@ -17,6 +17,7 @@ mod visualizer;
 mod robot_plugin;
 mod tilemap_plugin;
 mod camera_plugin;
+mod devy_debug_plugin;
 
 
 const CACHE_SIZE: usize = 100;
@@ -74,6 +75,7 @@ fn main() {
     /// PER L'USO DELLA CACHE INSERIRE UN PICCOLO DELAY INIZIALE DI UN PAIO DI SECONDI E UN PICCOLO DELAY (ANCHE DI UN MILLISECONDO) TRA UN LANCIO E L'ALTRO DELLA CACHE
     /// RICORDASI DI LIBERARE SEMPRE LA CACHE DOPO OGNI UTILIZZO, PER PERMETTERE AL VISAULIZER DI AVERE IL CONTROLLO
     /// cache.lock().unwrap() deve quindi essere in una funzione separata, come nell'esempio qui sotto
+    /// prima di inviare qualcosa con la cache inserire un delay di circa 100 millisecondi con sleep (potrebbe andare anche con meno, fare test)
     let cache_creation = Cache::new(CACHE_SIZE);
     let cache = Arc::new(Mutex::new(cache_creation));
 
@@ -92,10 +94,13 @@ fn main() {
 
     let mut runner = Runner::new(Box::new(MyRobot{robot: Robot::new()}), &mut map_creation);
 
-    ///Per far partire il visualizer, assicurarsi di avere un Arc<Mutex<>> sia della mappa che della cache(Punto 1 e 2).
-    /// Successivamente clonarli(Punto 3) e passarli al visualizer
-    /// La mappa clonarla (non ricordo perchè lo ho fatto e dovrebbe funzionare anche senza il clone, ma tanto non viene mai cambiato dopo l'init dal punto di vista del visualizer)
-    /// E' necessario metterlo come ultima parte fatta partire, e assicurarsi che tutto il resto (come il cache_usage nell'esempio), siano dentro thread separati
+    /// PER FAR PARTIRE IL VISUALIZER SERVE
+    ///
+    /// CLONE DELLA MAPPA "TOTALE"
+    /// ARC<MUTEX<>> CLONE DELLA CACHE (VEDERE SOPRA)
+    /// GRANDEZZA DELLA CACHE
+    /// RUNNER
+    /// QUANTITA' DI TICK DA ELABORARE (INSERIRE -1 PER FAR GIRARE IL RUNNER PER UN QUANTITATIVO INFINITO DI TICK)
     visualizer::start(map.clone(), visualizer_cache, CACHE_SIZE, runner, TICK_AMOUNT);
 }
 
@@ -103,8 +108,7 @@ fn main() {
 fn cache_usage(cache: Arc<Mutex<Cache>>){
 
     println!("I am using the cache, yippie!");
-    let timer_time = 1;
-
+    let timer_time = 100;
 
     sleep(std::time::Duration::from_millis(timer_time));
     {
