@@ -1,8 +1,13 @@
 use std::sync::{Arc, Mutex};
+use std::thread::sleep;
+use std::time::Duration;
 use bevy::prelude::*;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
+use robotics_lib::runner::Runner;
+use robotics_lib::utils::LibError;
 use robotics_lib::world::tile::Tile;
 use rstykrab_cache::Cache;
+use winit::platform::x11::XVisualID;
 use crate::camera_plugin::CameraPluginCustom;
 
 use crate::robot_plugin::RobotPlugin;
@@ -27,24 +32,32 @@ pub(crate) struct CacheForRobot { pub(crate) cache: Arc<Mutex<Cache>> }
 #[derive(Resource, Default)]
 pub(crate) struct TileSize { pub(crate) tile_size: f32 }
 
-pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>) {
+#[derive(Resource)]
+pub(crate) struct CacheSize { pub(crate) cache_size: usize }
 
-    //let map_created = map.lock().unwrap().clone();
+#[derive(Resource)]
+struct Ticks {
+    tick_amount: usize,
+    current_ticks: usize
+}
+
+struct RobotRunnable { runner: Result<Runner, LibError>}
+
+pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: usize) {
+
     let map_resource = Map { map: map };
 
     let cache_resource = CacheForRobot { cache };
 
     let tile_size_resource = TileSize { tile_size: TILE_SIZE };
 
+    let runner_resource = RobotRunnable{ runner };
+
+    let cache_size_resource = CacheSize{cache_size};
+
+    let tick_resource = Ticks{ tick_amount, current_ticks: 0 };
+
     App::new()
-        .insert_resource(tile_size_resource)
-        .insert_resource(map_resource)
-        .insert_resource(cache_resource)
-        .insert_resource(ClearColor(CLEAR))
-        .add_systems(PreStartup, assets)
-        .add_plugins(CameraPluginCustom)
-        .add_plugins(TileMapPlugin)
-        .add_plugins(RobotPlugin)
         .add_plugins(DefaultPlugins
             .set(WindowPlugin {
                 primary_window: Some(Window {
@@ -63,6 +76,18 @@ pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>) {
                     ..Default::default()
                 }
             }))
+        .insert_resource(tile_size_resource)
+        .insert_resource(map_resource)
+        .insert_resource(cache_resource)
+        .insert_resource(tick_resource)
+        .insert_resource(cache_size_resource)
+        .insert_resource(ClearColor(CLEAR))
+        .insert_non_send_resource(runner_resource)
+        .add_systems(PreStartup, assets)
+        .add_systems(PreUpdate, run_game)
+        .add_plugins(CameraPluginCustom)
+        .add_plugins(TileMapPlugin)
+        .add_plugins(RobotPlugin)
         .run();
 }
 
@@ -79,6 +104,16 @@ fn assets(mut commands: Commands, assets: Res<AssetServer>, mut atlas: ResMut<As
 
     let texture_atlas_handle = atlas.add(texture_atlas);
     commands.insert_resource(SpriteSheetRust(texture_atlas_handle));
+}
+
+fn run_game(mut runner: NonSendMut<RobotRunnable>, mut tick_controller: ResMut<Ticks>){
+
+    if(tick_controller.tick_amount > tick_controller.current_ticks) {
+        sleep(Duration::from_secs(5));
+        let mut res = Err(LibError::NoContent);
+        res = runner.runner.as_mut().unwrap().game_tick();
+    }
+    tick_controller.current_ticks += 1;
 }
 
 

@@ -7,7 +7,7 @@ use rstykrab_cache::Action;
 use crate::tilemap_plugin::{Explorable};
 
 use crate::visualizer;
-use crate::visualizer::{CacheForRobot, TileSize};
+use crate::visualizer::{CacheForRobot, CacheSize, TileSize};
 
 pub(crate) struct RobotPlugin;
 
@@ -28,7 +28,7 @@ const SLEEP_TIME_MILLIS: u64 = 1;
 impl Plugin for RobotPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, robot);
+            .add_systems(PostUpdate, robot);
     }
 }
 
@@ -120,9 +120,10 @@ fn robot(
     tile_size: Res<TileSize>,
     mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
     mut content_query: Query<(&Explorable, &mut Visibility)>,
+    cache_size: Res<CacheSize>,
 ) {
         let mut history = cache.as_ref().cache.lock().unwrap();
-        if let Ok(mut recent_actions) = history.get_recent_actions(100) {
+        if let Ok(mut recent_actions) = history.get_recent_actions(cache_size.cache_size) {
             recent_actions.reverse();
             println!("Cache contains {:?}", recent_actions);
             for record in recent_actions {
@@ -161,7 +162,7 @@ fn robot(
             }
 
             history.set_size(0);
-            history.set_size(100);
+            history.set_size(cache_size.cache_size);
         } else {
             println!("Error: Invalid count specified");
         }
