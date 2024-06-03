@@ -4490,7 +4490,7 @@ dependencies = [
 
 [[package]]
 name = "robot_visualizer"
-version = "0.1.2"
+version = "0.1.4"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",

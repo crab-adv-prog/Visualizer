@@ -97,17 +97,17 @@ fn remove_content(
 
 fn explore_tile(
     mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
-    left_bottom_angle: &(usize, usize),
-    right_top_angle: &(usize, usize)
+    left_bottom_angle: &(isize, isize),
+    right_top_angle: &(isize, isize)
 ){
     println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
     for (content_tile, mut visibility) in robot_query {
-        let high_x_check = (content_tile.position.0 as usize >= left_bottom_angle.0);
-        let high_y_check = (content_tile.position.1 as usize >= left_bottom_angle.1);
+        let high_x_check = (content_tile.position.0 as isize >= left_bottom_angle.0);
+        let high_y_check = (content_tile.position.1 as isize >= left_bottom_angle.1);
         let right_top_check = high_x_check && high_y_check;
 
-        let low_x_check = (content_tile.position.0 as usize <= right_top_angle.0);
-        let low_y_check = (content_tile.position.1 as usize <= right_top_angle.1);
+        let low_x_check = (content_tile.position.0 as isize <= right_top_angle.0);
+        let low_y_check = (content_tile.position.1 as isize <= right_top_angle.1);
         let left_bottom_check = low_x_check && low_y_check;
 
         if(right_top_check && left_bottom_check){
@@ -154,8 +154,8 @@ fn robot(
                             }
                             "destroy_content" => { remove_content(&mut content_query, &record.position)}
                             "explore_map" => {
-                                let right_top: (usize, usize) = (record_string[1].parse().unwrap(), record_string[2].parse().unwrap());
-                                let left_top: (usize, usize) = (record_string[3].parse().unwrap(), record_string[4].parse().unwrap());
+                                let right_top: (isize, isize) = (record_string[1].parse().unwrap(), record_string[2].parse().unwrap());
+                                let left_top: (isize, isize) = (record_string[3].parse().unwrap(), record_string[4].parse().unwrap());
                                 explore_tile(&mut content_query, &right_top, &left_top)}
                             _ => {}
                         }
