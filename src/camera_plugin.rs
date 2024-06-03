@@ -17,15 +17,11 @@ impl Plugin for CameraPluginCustom{
     }
 }
 
-fn create_camera(mut commands: Commands, map: Res<Map>, tile_size: Res<TileSize> ) {
-    let world = map.as_ref().map.clone();
-    let tile_size = tile_size.as_ref().tile_size;
-
-    let camera_position = ((world.len() as f32 / 2.0).floor() * tile_size, (world[0].len() as f32/ 2.0).floor() * tile_size);
+fn create_camera(mut commands: Commands) {
 
     commands.spawn((
         Camera2dBundle {
-            transform: Transform::from_xyz(camera_position.0, camera_position.1, 0.0),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..Default::default()
         }, crate::visualizer::MyCameraMarker
     ))
