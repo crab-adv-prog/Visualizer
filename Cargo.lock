@@ -4626,7 +4626,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "robot"
+name = "robot_visualizer"
 version = "0.1.0"
 dependencies = [
  "bevy",
