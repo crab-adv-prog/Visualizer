@@ -13,7 +13,7 @@ use robotics_lib::world::world_generator::Generator;
 use rstykrab_cache::{Action, Cache};
 use worldgen_unwrap::public::WorldgeneratorUnwrap;
 
-mod visualizer;
+pub mod visualizer;
 mod robot_plugin;
 mod tilemap_plugin;
 mod camera_plugin;
