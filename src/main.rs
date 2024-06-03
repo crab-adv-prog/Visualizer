@@ -113,7 +113,7 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
     sleep(std::time::Duration::from_millis(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        let command = "explore_map 20 20 30 30".to_string();
+        let command = "explore_map 0 0 30 30".to_string();
         println!("{}", command);
         cache.add_record(Action::Other(command), (23, 25));
     }
