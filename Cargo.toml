@@ -16,3 +16,4 @@ ohcrab_weather = {version= "0.1.2", registry = "kellnr" }
 rustici_planner = {version= "0.1.6", registry = "kellnr" }
 sense_and_find_by_rustafariani = {version= "0.1.7", registry = "kellnr" }
 bob_lib = {version= "0.1.4", registry = "kellnr" }
+rand = "0.8.5"

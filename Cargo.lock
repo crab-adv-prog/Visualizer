@@ -4560,6 +4560,7 @@ dependencies = [
  "ghost_journey_journal",
  "ohcrab_weather",
  "oxagaudiotool",
+ "rand 0.8.5",
  "robotics_lib",
  "rstykrab_cache",
  "rustici_planner",

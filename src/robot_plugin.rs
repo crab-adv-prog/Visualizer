@@ -1,3 +1,4 @@
+use std::thread::sleep;
 use bevy::asset::AssetContainer;
 use bevy::ecs::bundle::DynamicBundle;
 use bevy::ecs::query::QuerySingleError;
@@ -22,13 +23,12 @@ struct ID{
     id: i32
 }
 
-const TIMER_TIME: f32 = 1.0;
+const SLEEP_TIME_MILLIS: u64 = 1;
 
 impl Plugin for RobotPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, robot)
-            .insert_resource(TimerCache { timer: Timer::from_seconds(TIMER_TIME, TimerMode::Repeating) });
+            .add_systems(Update, robot);
     }
 }
 
@@ -39,6 +39,7 @@ fn spawn_robot(
     pos: &(usize, usize),
     id: i32
 ) {
+    println!("Creating robot {} in {:?}", id, pos);
     let mut robot = TextureAtlasSprite::new(11);
     let tile_size = tile_size.as_ref().tile_size;
     let x = pos.0 as f32 * tile_size;
@@ -50,7 +51,7 @@ fn spawn_robot(
 
     let robot_name = "Robot_".to_string() + &*id.to_string();
 
-    let robot = commands.spawn((SpriteSheetBundle {
+    commands.spawn((SpriteSheetBundle {
         texture_atlas: sprite.0.clone(),
         sprite: robot,
         transform: Transform::from_xyz(robot_position.0, robot_position.1, 1.0),
@@ -65,6 +66,7 @@ fn move_robot_with_id(
     id: &i32,
     tile_size: &Res<TileSize>
 ){
+    println!("Moving robot {} to {:?}", id, new_position);
     for (_, mut position_iter, id_iter) in robot_query{
         if(*id == id_iter.unwrap().id){
             let tile_size = tile_size.as_ref().tile_size;
@@ -80,6 +82,7 @@ fn remove_content(
     mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
     position_to_remove: &(usize, usize)
 ){
+    println!("Removing content at {:?}", position_to_remove);
      for (content_tile, mut visibility) in robot_query {
          let x_check = (content_tile.position.0 as usize == position_to_remove.0);
          let y_check = (content_tile.position.1 as usize == position_to_remove.1);
@@ -94,6 +97,7 @@ fn explore_tile(
     left_bottom_angle: &(usize, usize),
     right_top_angle: &(usize, usize)
 ){
+    println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
     for (content_tile, mut visibility) in robot_query {
         let high_x_check = (content_tile.position.0 as usize >= left_bottom_angle.0);
         let high_y_check = (content_tile.position.1 as usize >= left_bottom_angle.1);
@@ -103,10 +107,6 @@ fn explore_tile(
         let low_y_check = (content_tile.position.1 as usize <= right_top_angle.1);
         let left_bottom_check = low_x_check && low_y_check;
 
-        if(right_top_check || left_bottom_check){
-            println!("x: {}, y: {}, is_in_top_right: {}, is_in_bottom_left: {}", content_tile.position.0, content_tile.position.1, right_top_check, left_bottom_check)
-        }
-
         if(right_top_check && left_bottom_check){
             *visibility = Visibility::Visible
         }
@@ -114,8 +114,6 @@ fn explore_tile(
 }
 
 fn robot(
-    mut timer: ResMut<TimerCache>,
-    time: Res<Time>,
     cache: Res<CacheForRobot>,
     mut commands: Commands,
     sprite: Res<visualizer::SpriteSheetRust>,
@@ -123,18 +121,16 @@ fn robot(
     mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
     mut content_query: Query<(&Explorable, &mut Visibility)>,
 ) {
-    timer.timer.tick(time.delta());
-
-    if timer.timer.finished() {
-        println!("Explore map");
         let mut history = cache.as_ref().cache.lock().unwrap();
-        if let Ok(mut recent_actions) = history.get_recent_actions(5) {
+        if let Ok(mut recent_actions) = history.get_recent_actions(100) {
             recent_actions.reverse();
+            println!("Cache contains {:?}", recent_actions);
             for record in recent_actions {
                 println!("Action in explore_map is:  {:?}", record);
                 match &record.action {
                     Action::Other(record_string) => {
                         let record_string: Vec<&str> = record_string.split(' ').collect();
+                        sleep(std::time::Duration::from_millis(SLEEP_TIME_MILLIS));
                         match record_string[0] {
                             "spawn_robot" => { spawn_robot(&mut commands, &sprite, &tile_size, &record.position, 0) }
                             "spawn_robot_with_id" => {
@@ -165,10 +161,9 @@ fn robot(
             }
 
             history.set_size(0);
-            history.set_size(25);
+            history.set_size(100);
         } else {
             println!("Error: Invalid count specified");
         }
-    }
 }
 
