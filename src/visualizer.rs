@@ -39,13 +39,13 @@ pub(crate) struct CacheSize { pub(crate) cache_size: usize }
 
 #[derive(Resource)]
 struct Ticks {
-    tick_amount: usize,
-    current_ticks: usize
+    tick_amount: isize,
+    current_ticks: isize
 }
 
 struct RobotRunnable { runner: Result<Runner, LibError>}
 
-pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: usize) {
+pub(crate) fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: isize) {
 
     let map_resource = Map { map: map };
 

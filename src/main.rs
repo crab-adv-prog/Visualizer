@@ -21,7 +21,7 @@ mod devy_debug_plugin;
 
 
 const CACHE_SIZE: usize = 100;
-const TICK_AMOUNT: usize = 10;
+const TICK_AMOUNT: isize = 10;
 
 pub struct MyRobot{
     robot: Robot,
