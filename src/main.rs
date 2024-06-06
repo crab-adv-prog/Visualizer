@@ -262,4 +262,12 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
         cache.add_record(Action::Other(command), (25,24));
     }
 
+    sleep(std::time::Duration::from_millis(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "start_audio walk_sound 1.0".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (25,24));
+    }
+
 }

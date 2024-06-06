@@ -1,10 +1,7 @@
 use std::fmt::Alignment;
 use std::thread::sleep;
 
-use bevy::{
-    reflect::TypePath,
-    render::render_resource::{AsBindGroup, ShaderRef},
-};
+use bevy::{reflect::TypePath, render::render_resource::{AsBindGroup, ShaderRef}, sprite};
 use bevy::a11y::AccessibilityNode;
 use bevy::a11y::accesskit::{NodeBuilder, Role};
 use bevy::asset::AssetContainer;
@@ -16,11 +13,12 @@ use bevy::ui::*;
 use bevy::ui::MaxTrackSizingFunction::Px;
 use bevy::ui::Val::Percent;
 use bevy_inspector_egui::__macro_exports::bevy_reflect::{TypeRegistry, TypeRegistryArc};
+use oxagaudiotool::sound_config::OxAgSoundConfig;
 use rstykrab_cache::Action;
 
 use crate::tilemap_plugin::Explorable;
 use crate::visualizer;
-use crate::visualizer::{CacheForRobot, CacheSize, TileSize};
+use crate::visualizer::{AudioRes, CacheForRobot, CacheSize, TileSize};
 
 pub(crate) struct RobotPlugin;
 
@@ -88,7 +86,9 @@ fn move_robot_with_id(
     new_position: &(u32, u32),
     id: &i32,
     tile_size: &Res<TileSize>,
+    audio: &mut ResMut<AudioRes>,
 ) {
+
     println!("Moving robot {} to {:?}", id, new_position);
     for (_, mut position_iter, id_iter) in robot_query {
         println!("Robot in pos {:?} and id {:?}", position_iter, id_iter);
@@ -104,26 +104,26 @@ fn move_robot_with_id(
 }
 
 fn remove_content(
-    mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
+    mut robot_query: &mut Query<(&Explorable, &mut Visibility, &mut TextureAtlasSprite)>,
     position_to_remove: &(usize, usize),
 ) {
     println!("Removing content at {:?}", position_to_remove);
-    for (content_tile, mut visibility) in robot_query {
+    for (content_tile, _, mut sprite) in robot_query {
         let x_check = (content_tile.position.0 as usize == position_to_remove.0);
         let y_check = (content_tile.position.1 as usize == position_to_remove.1);
         if (x_check && y_check && content_tile.isContent) {
-            *visibility = Visibility::Hidden
+            *sprite = TextureAtlasSprite::new(27)
         }
     }
 }
 
 fn explore_tile(
-    mut robot_query: &mut Query<(&Explorable, &mut Visibility)>,
+    mut robot_query: &mut Query<(&Explorable, &mut Visibility, &mut TextureAtlasSprite)>,
     left_bottom_angle: &(isize, isize),
     right_top_angle: &(isize, isize),
 ) {
     println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
-    for (content_tile, mut visibility) in robot_query {
+    for (content_tile, mut visibility, _) in robot_query {
         let high_x_check = (content_tile.position.0 as isize >= left_bottom_angle.0);
         let high_y_check = (content_tile.position.1 as isize >= left_bottom_angle.1);
         let right_top_check = high_x_check && high_y_check;
@@ -144,10 +144,11 @@ fn robot(
     sprite: Res<visualizer::SpriteSheetRust>,
     tile_size: Res<TileSize>,
     mut robot_query: Query<(&Robot, &mut Transform, Option<&ID>)>,
-    mut content_query: Query<(&Explorable, &mut Visibility)>,
+    mut content_query: Query<(&Explorable, &mut Visibility, &mut TextureAtlasSprite)>,
     cache_size: Res<CacheSize>,
     mut actions: ResMut<UserActions>,
     mut text_query: Query<&mut Text, With<Log>>,
+    mut audio: ResMut<AudioRes>
 ) {
     let mut history = cache.as_ref().cache.lock().unwrap();
     if let Ok(mut recent_actions) = history.get_recent_actions(cache_size.cache_size) {
@@ -170,19 +171,25 @@ fn robot(
                         "move_robot" => {
                             let x: u32 = record_string[1].parse().unwrap();
                             let y: u32 = record_string[2].parse().unwrap();
-                            move_robot_with_id(&mut robot_query, &(x, y), &0, &tile_size)
+                            move_robot_with_id(&mut robot_query, &(x, y), &0, &tile_size, &mut audio)
                         }
                         "move_robot_multiple" => {
                             let id: i32 = record_string[1].parse().unwrap();
                             let x: u32 = record_string[2].parse().unwrap();
                             let y: u32 = record_string[3].parse().unwrap();
-                            move_robot_with_id(&mut robot_query, &(x, y), &id, &tile_size)
+                            move_robot_with_id(&mut robot_query, &(x, y), &id, &tile_size, &mut audio)
                         }
                         "destroy_content" => { remove_content(&mut content_query, &record.position) }
                         "explore_map" => {
                             let right_top: (isize, isize) = (record_string[1].parse().unwrap(), record_string[2].parse().unwrap());
                             let left_top: (isize, isize) = (record_string[3].parse().unwrap(), record_string[4].parse().unwrap());
                             explore_tile(&mut content_query, &right_top, &left_top)
+                        }
+                        "start_audio" => {
+                            println!("assets/music/{}.ogg",record_string[1]);
+                            let volume: f64 = record_string[2].parse().unwrap();
+                            let background_music = OxAgSoundConfig::new_looped_with_volume(&format!("assets/music/{}.ogg",record_string[1]), 2.0);
+                            audio.audio.play_audio(&background_music).expect("Panico, panico, panico paura!");
                         }
                         _ => {}
                     }

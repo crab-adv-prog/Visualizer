@@ -2,6 +2,8 @@ use std::sync::{Arc, Mutex};
 
 use bevy::prelude::*;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
+use oxagaudiotool::OxAgAudioTool;
+use oxagaudiotool::sound_config::OxAgSoundConfig;
 use robotics_lib::runner::Runner;
 use robotics_lib::utils::LibError;
 use robotics_lib::world::tile::Tile;
@@ -40,9 +42,16 @@ struct Ticks {
     current_ticks: isize
 }
 
+#[derive(Resource)]
+pub(crate) struct AudioRes{
+    pub(crate) audio: OxAgAudioTool
+}
+
 struct RobotRunnable { runner: Result<Runner, LibError>}
 
 pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: isize) {
+
+    let audio_resource = AudioRes{ audio: OxAgAudioTool::new(Default::default(), Default::default(), Default::default()).unwrap() };
 
     let map_resource = Map { map: map };
 
@@ -76,6 +85,7 @@ pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, r
                 }
             }))
         .insert_resource(tile_size_resource)
+        .insert_resource(audio_resource)
         .insert_resource(map_resource)
         .insert_resource(cache_resource)
         .insert_resource(tick_resource)
@@ -91,7 +101,11 @@ pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, r
         .run();
 }
 
-fn assets(mut commands: Commands, assets: Res<AssetServer>, mut atlas: ResMut<Assets<TextureAtlas>>) {
+fn assets(mut commands: Commands, assets: Res<AssetServer>, mut atlas: ResMut<Assets<TextureAtlas>>, mut audio: ResMut<AudioRes>) {
+
+    let background_music = OxAgSoundConfig::new_looped_with_volume("assets/music/background_music.ogg", 2.0);
+    audio.audio.play_audio(&background_music);
+
     let image = assets.load("SpriteSheetRust.png");
     let texture_atlas = TextureAtlas::from_grid(
         image,

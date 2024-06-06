@@ -7,6 +7,8 @@ use crate::visualizer::{Map, TileSize};
 
 pub(crate) struct TileMapPlugin;
 
+
+
 #[derive(Component)]
 pub(crate) struct Explorable{
     pub(crate) position: (u32, u32),

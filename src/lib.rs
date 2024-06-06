@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::thread::sleep;
+
 use rand::Rng;
 use robotics_lib::energy::Energy;
 use robotics_lib::event::events::Event;
@@ -8,7 +9,6 @@ use robotics_lib::runner::{Robot, Runnable, Runner};
 use robotics_lib::runner::backpack::BackPack;
 use robotics_lib::world::coordinates::Coordinate;
 use robotics_lib::world::World;
-
 use robotics_lib::world::world_generator::Generator;
 use rstykrab_cache::{Action, Cache};
 use worldgen_unwrap::public::WorldgeneratorUnwrap;
@@ -71,6 +71,7 @@ fn main() {
     /// cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
     /// cache.add_record("destroy_content", (x,y)), per rimuovere il content in (x,y)
     /// cache.add_record("explore_map x1 y1 x2 y2", (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
+    /// cache.add_record("start_audio 'audio_file_name'", (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg
     ///
     /// PER L'USO DELLA CACHE INSERIRE UN PICCOLO DELAY INIZIALE DI UN PAIO DI SECONDI E UN PICCOLO DELAY (ANCHE DI UN MILLISECONDO) TRA UN LANCIO E L'ALTRO DELLA CACHE
     /// RICORDASI DI LIBERARE SEMPRE LA CACHE DOPO OGNI UTILIZZO, PER PERMETTERE AL VISAULIZER DI AVERE IL CONTROLLO
@@ -113,7 +114,7 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
     sleep(std::time::Duration::from_millis(timer_time));
     {
         let mut cache = cache.lock().unwrap();
-        let command = "explore_map 20 20 30 30".to_string();
+        let command = "explore_map 0 0 30 30".to_string();
         println!("{}", command);
         cache.add_record(Action::Other(command), (23, 25));
     }
@@ -258,6 +259,14 @@ fn cache_usage(cache: Arc<Mutex<Cache>>){
     {
         let mut cache = cache.lock().unwrap();
         let command = "move_robot 25 23".to_string();
+        println!("{}", command);
+        cache.add_record(Action::Other(command), (25,24));
+    }
+
+    sleep(std::time::Duration::from_millis(timer_time));
+    {
+        let mut cache = cache.lock().unwrap();
+        let command = "start_audio walk_sound 1.0".to_string();
         println!("{}", command);
         cache.add_record(Action::Other(command), (25,24));
     }
