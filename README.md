@@ -4,5 +4,5 @@ World visualizer
 To import as dependency:
 
 ```toml
-robot_visualizer = { version = "0.2.0", git = "https://github.com/crab-adv-prog/Visualizer.git"}
+robot_visualizer = { version = "0.3.1", git = "https://github.com/crab-adv-prog/Visualizer.git"}
 ```
