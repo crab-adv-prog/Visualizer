@@ -49,4 +49,16 @@ cache.add_record("move_robot x1 y1", (x,y)), per muovere il robot da (x,y) a (x1
 cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
 cache.add_record("destroy_content", (x,y)), per rimuovere il content in (x,y)
 cache.add_record("explore_map x1 y1 x2 y2", (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
-cache.add_record("start_audio 'audio_file_name'", (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg```
+cache.add_record("start_audio 'audio_file_name'", (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg
+```
+
+
+## NOTE
+
+### To use the visualizer you will need two important files:
+
+A file called ```SpriteSheetRust.png``` that will contain the assets. The file needs to be put inside a assets folder in the root of the project
+Every asset needs to be ```32x32 pixels```. They'll need to be in a ```12x6 grid``` and have ```3 pixel``` distance between each-other
+
+A file called ```background_music.ogg``` that will contain the background music of the app. It needs to be to put in a music folder inside the assets folder mentioned before.
+Inside this folder you will need to insert the audio to call with the ```start_audio``` command
