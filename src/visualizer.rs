@@ -1,17 +1,14 @@
 use std::sync::{Arc, Mutex};
-use std::thread::sleep;
-use std::time::Duration;
+
 use bevy::prelude::*;
-use bevy::reflect::TypeRegistryArc;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
 use robotics_lib::runner::Runner;
 use robotics_lib::utils::LibError;
 use robotics_lib::world::tile::Tile;
 use rstykrab_cache::Cache;
-use winit::platform::x11::XVisualID;
+
 use crate::camera_plugin::CameraPluginCustom;
 use crate::devy_debug_plugin::DebugPlugin;
-
 use crate::robot_plugin::RobotPlugin;
 use crate::tilemap_plugin::TileMapPlugin;
 
