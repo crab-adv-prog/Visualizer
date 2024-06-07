@@ -46,12 +46,12 @@ fn create_map(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRust>, 
             commands.spawn((SpriteSheetBundle {
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
-                transform: Transform::from_xyz((i as f32) * tile_size, (j as f32) * tile_size, -2.0),
-                visibility: Visibility::Hidden,
+                transform: Transform::from_xyz((j as f32) * tile_size, (i as f32) * tile_size, -2.0),
+                visibility: Visibility::Visible,
                 ..Default::default()
             },
                 Explorable {
-                    position: (i as u32, j as u32),
+                    position: (j as u32, i as u32),
                     isContent: false
                 }
             ));
@@ -89,12 +89,12 @@ fn create_content(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRus
             commands.spawn((SpriteSheetBundle {
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
-                transform: Transform::from_xyz((i as f32) * tile_size, (j as f32) * tile_size, -1.0),
-                visibility: Visibility::Hidden,
+                transform: Transform::from_xyz((j as f32) * tile_size, (i as f32) * tile_size, -1.0),
+                visibility: Visibility::Visible,
                 ..Default::default()
             },
             Explorable {
-                position: (i as u32, j as u32),
+                position: (j as u32, i as u32),
                 isContent: true
             }));
         }
