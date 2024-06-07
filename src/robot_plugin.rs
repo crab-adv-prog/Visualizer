@@ -43,7 +43,7 @@ struct UserActions {
 #[derive(Component)]
 struct Log;
 
-const SLEEP_TIME_MILLIS: u64 = 1;
+const SLEEP_TIME_MILLIS: u64 = 0;
 
 impl Plugin for RobotPlugin {
     fn build(&self, app: &mut App) {
@@ -64,8 +64,8 @@ fn spawn_robot(
     //println!("Creating robot {} in {:?}", id, pos);
     let mut robot = TextureAtlasSprite::new(11);
     let tile_size = tile_size.as_ref().tile_size;
-    let x = pos.1 as f32 * tile_size;
-    let y = pos.0 as f32 * tile_size;
+    let x = pos.0 as f32 * tile_size;
+    let y = pos.1 as f32 * tile_size;
 
     let robot_position = (x, y);
 
@@ -95,8 +95,8 @@ fn move_robot_with_id(
         if (*id == id_iter.unwrap().id) {
             //println!("Found the robot with id {}. Moving it to {:?}", id, new_position);
             let tile_size = tile_size.as_ref().tile_size;
-            let x = new_position.1 as f32 * tile_size;
-            let y = new_position.0 as f32 * tile_size;
+            let x = new_position.0 as f32 * tile_size;
+            let y = new_position.1 as f32 * tile_size;
 
             *position_iter = Transform::from_xyz(x, y, 1.0);
         }
@@ -109,8 +109,8 @@ fn remove_content(
 ) {
     //println!("Removing content at {:?}", position_to_remove);
     for (content_tile, _, mut sprite) in robot_query {
-        let x_check = (content_tile.position.1 as usize == position_to_remove.0);
-        let y_check = (content_tile.position.0 as usize == position_to_remove.1);
+        let x_check = (content_tile.position.0 as usize == position_to_remove.0);
+        let y_check = (content_tile.position.1 as usize == position_to_remove.1);
         if (x_check && y_check && content_tile.isContent) {
             *sprite = TextureAtlasSprite::new(27)
         }
@@ -124,12 +124,12 @@ fn explore_tile(
 ) {
     //println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
     for (content_tile, mut visibility, _) in robot_query {
-        let high_x_check = (content_tile.position.1 as isize >= left_bottom_angle.0);
-        let high_y_check = (content_tile.position.0 as isize >= left_bottom_angle.1);
+        let high_x_check = (content_tile.position.0 as isize >= left_bottom_angle.0);
+        let high_y_check = (content_tile.position.1 as isize >= left_bottom_angle.1);
         let right_top_check = high_x_check && high_y_check;
 
-        let low_x_check = (content_tile.position.1 as isize <= right_top_angle.0);
-        let low_y_check = (content_tile.position.0 as isize <= right_top_angle.1);
+        let low_x_check = (content_tile.position.0 as isize <= right_top_angle.0);
+        let low_y_check = (content_tile.position.1 as isize <= right_top_angle.1);
         let left_bottom_check = low_x_check && low_y_check;
 
         if (right_top_check && left_bottom_check) {

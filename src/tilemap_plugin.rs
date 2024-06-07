@@ -47,7 +47,7 @@ fn create_map(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRust>, 
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
                 transform: Transform::from_xyz((j as f32) * tile_size, (i as f32) * tile_size, -2.0),
-                visibility: Visibility::Visible,
+                visibility: Visibility::Hidden,
                 ..Default::default()
             },
                 Explorable {
@@ -90,7 +90,7 @@ fn create_content(mut commands: Commands, sprite: Res<visualizer::SpriteSheetRus
                 texture_atlas: sprite.0.clone(),
                 sprite: imageTile,
                 transform: Transform::from_xyz((j as f32) * tile_size, (i as f32) * tile_size, -1.0),
-                visibility: Visibility::Visible,
+                visibility: Visibility::Hidden,
                 ..Default::default()
             },
             Explorable {
