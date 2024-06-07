@@ -4560,7 +4560,7 @@ dependencies = [
 
 [[package]]
 name = "robot_visualizer"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",

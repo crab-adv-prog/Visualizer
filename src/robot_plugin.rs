@@ -61,7 +61,7 @@ fn spawn_robot(
     pos: &(usize, usize),
     id: i32,
 ) {
-    println!("Creating robot {} in {:?}", id, pos);
+    //println!("Creating robot {} in {:?}", id, pos);
     let mut robot = TextureAtlasSprite::new(11);
     let tile_size = tile_size.as_ref().tile_size;
     let x = pos.0 as f32 * tile_size;
@@ -89,11 +89,11 @@ fn move_robot_with_id(
     audio: &mut ResMut<AudioRes>,
 ) {
 
-    println!("Moving robot {} to {:?}", id, new_position);
+    //println!("Moving robot {} to {:?}", id, new_position);
     for (_, mut position_iter, id_iter) in robot_query {
-        println!("Robot in pos {:?} and id {:?}", position_iter, id_iter);
+        //println!("Robot in pos {:?} and id {:?}", position_iter, id_iter);
         if (*id == id_iter.unwrap().id) {
-            println!("Found the robot with id {}. Moving it to {:?}", id, new_position);
+            //println!("Found the robot with id {}. Moving it to {:?}", id, new_position);
             let tile_size = tile_size.as_ref().tile_size;
             let x = new_position.0 as f32 * tile_size;
             let y = new_position.1 as f32 * tile_size;
@@ -107,7 +107,7 @@ fn remove_content(
     mut robot_query: &mut Query<(&Explorable, &mut Visibility, &mut TextureAtlasSprite)>,
     position_to_remove: &(usize, usize),
 ) {
-    println!("Removing content at {:?}", position_to_remove);
+    //println!("Removing content at {:?}", position_to_remove);
     for (content_tile, _, mut sprite) in robot_query {
         let x_check = (content_tile.position.0 as usize == position_to_remove.0);
         let y_check = (content_tile.position.1 as usize == position_to_remove.1);
@@ -122,7 +122,7 @@ fn explore_tile(
     left_bottom_angle: &(isize, isize),
     right_top_angle: &(isize, isize),
 ) {
-    println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
+    //println!("Exploring map from {:?} to {:?}", left_bottom_angle, right_top_angle);
     for (content_tile, mut visibility, _) in robot_query {
         let high_x_check = (content_tile.position.0 as isize >= left_bottom_angle.0);
         let high_y_check = (content_tile.position.1 as isize >= left_bottom_angle.1);
@@ -153,9 +153,9 @@ fn robot(
     let mut history = cache.as_ref().cache.lock().unwrap();
     if let Ok(mut recent_actions) = history.get_recent_actions(cache_size.cache_size) {
         recent_actions.reverse();
-        println!("Cache contains {:?}", recent_actions);
+        //println!("Cache contains {:?}", recent_actions);
         for record in recent_actions {
-            println!("Action in explore_map is:  {:?}", record);
+            //println!("Action in explore_map is:  {:?}", record);
             match &record.action {
                 Action::Other(record_string) => {
                     actions.actions.insert(0, record_string.clone());
@@ -186,7 +186,7 @@ fn robot(
                             explore_tile(&mut content_query, &right_top, &left_top)
                         }
                         "start_audio" => {
-                            println!("assets/music/{}.ogg",record_string[1]);
+                            //println!("assets/music/{}.ogg",record_string[1]);
                             let volume: f64 = record_string[2].parse().unwrap();
                             let background_music = OxAgSoundConfig::new_with_volume(&format!("assets/music/{}.ogg",record_string[1]), 2.0);
                             audio.audio.play_audio(&background_music).expect("Panico, panico, panico paura!");
@@ -201,7 +201,7 @@ fn robot(
         history.set_size(0);
         history.set_size(cache_size.cache_size);
     } else {
-        println!("Error: Invalid count specified");
+        //println!("Error: Invalid count specified");
     }
 }
 
