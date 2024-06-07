@@ -188,7 +188,7 @@ fn robot(
                         "start_audio" => {
                             println!("assets/music/{}.ogg",record_string[1]);
                             let volume: f64 = record_string[2].parse().unwrap();
-                            let background_music = OxAgSoundConfig::new_looped_with_volume(&format!("assets/music/{}.ogg",record_string[1]), 2.0);
+                            let background_music = OxAgSoundConfig::new_with_volume(&format!("assets/music/{}.ogg",record_string[1]), 2.0);
                             audio.audio.play_audio(&background_music).expect("Panico, panico, panico paura!");
                         }
                         _ => {}
