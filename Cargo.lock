@@ -2670,7 +2670,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.54.0",
+ "windows 0.44.0",
 ]
 
 [[package]]
@@ -4020,6 +4020,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ohcrab_weather"
+version = "0.1.2"
+source = "sparse+https://advancedprogramming.disi.unitn.it/api/v1/crates/"
+checksum = "2f5da6f2ae0f2c5449d83a80fdadf51e16311408ec77d26f17e6dfdb4e169350"
+dependencies = [
+ "robotics_lib",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4560,11 +4569,12 @@ dependencies = [
 
 [[package]]
 name = "robot_visualizer"
-version = "0.3.6"
+version = "0.3.7"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "bevy_pancam",
+ "ohcrab_weather",
  "oxagaudiotool",
  "rand 0.8.5",
  "robotics_lib",

@@ -2,12 +2,14 @@ use std::sync::{Arc, Mutex};
 
 use bevy::prelude::*;
 use bevy::render::texture::{ImageFilterMode, ImageSamplerDescriptor};
+use ohcrab_weather::weather_tool::WeatherPredictionTool;
 use oxagaudiotool::OxAgAudioTool;
 use oxagaudiotool::sound_config::OxAgSoundConfig;
 use robotics_lib::runner::Runner;
 use robotics_lib::utils::LibError;
 use robotics_lib::world::tile::Tile;
 use rstykrab_cache::Cache;
+use crate::background_plugin::BgPlugin;
 
 use crate::camera_plugin::CameraPluginCustom;
 use crate::devy_debug_plugin::DebugPlugin;
@@ -30,6 +32,9 @@ pub(crate) struct Map { pub(crate) map: Vec<Vec<Tile>> }
 #[derive(Resource)]
 pub(crate) struct CacheForRobot { pub(crate) cache: Arc<Mutex<Cache>> }
 
+#[derive(Resource)]
+pub(crate) struct WeatherForRobot { pub(crate) weather: Arc<Mutex<WeatherPredictionTool>> }
+
 #[derive(Resource, Default)]
 pub(crate) struct TileSize { pub(crate) tile_size: f32 }
 
@@ -49,13 +54,15 @@ pub(crate) struct AudioRes{
 
 struct RobotRunnable { runner: Result<Runner, LibError>}
 
-pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: isize) {
+pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, runner: Result<Runner, LibError>, tick_amount: isize, weather_predict: Arc<Mutex<WeatherPredictionTool>>) {
 
     let audio_resource = AudioRes{ audio: OxAgAudioTool::new(Default::default(), Default::default(), Default::default()).unwrap() };
 
     let map_resource = Map { map: map };
 
     let cache_resource = CacheForRobot { cache };
+
+    let weather_resource = WeatherForRobot { weather: weather_predict};
 
     let tile_size_resource = TileSize { tile_size: TILE_SIZE };
 
@@ -64,6 +71,7 @@ pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, r
     let cache_size_resource = CacheSize{cache_size};
 
     let tick_resource = Ticks{ tick_amount, current_ticks: 0 };
+
 
     App::new()
         .add_plugins(DefaultPlugins
@@ -88,6 +96,7 @@ pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, r
         .insert_resource(audio_resource)
         .insert_resource(map_resource)
         .insert_resource(cache_resource)
+        .insert_resource(weather_resource)
         .insert_resource(tick_resource)
         .insert_resource(cache_size_resource)
         .insert_resource(ClearColor(CLEAR))
@@ -98,6 +107,7 @@ pub fn start(map: Vec<Vec<Tile>>, cache: Arc<Mutex<Cache>>, cache_size: usize, r
         .add_plugins(TileMapPlugin)
         .add_plugins(RobotPlugin)
         .add_plugins(DebugPlugin)
+        .add_plugins(BgPlugin)
         .run();
 }
 

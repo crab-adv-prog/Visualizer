@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::thread::sleep;
+use ohcrab_weather::weather_tool::WeatherPredictionTool;
 
 use rand::Rng;
 use robotics_lib::energy::Energy;
@@ -18,6 +19,8 @@ mod robot_plugin;
 mod tilemap_plugin;
 mod camera_plugin;
 mod devy_debug_plugin;
+mod background_plugin;
+
 
 
 const CACHE_SIZE: usize = 100;
@@ -71,7 +74,6 @@ fn main() {
     /// cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
     /// cache.add_record("destroy_content", (x,y)), per rimuovere il content in (x,y)
     /// cache.add_record("explore_map x1 y1 x2 y2", (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
-    /// cache.add_record("start_audio 'audio_file_name'", (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg
     ///
     /// PER L'USO DELLA CACHE INSERIRE UN PICCOLO DELAY INIZIALE DI UN PAIO DI SECONDI E UN PICCOLO DELAY (ANCHE DI UN MILLISECONDO) TRA UN LANCIO E L'ALTRO DELLA CACHE
     /// RICORDASI DI LIBERARE SEMPRE LA CACHE DOPO OGNI UTILIZZO, PER PERMETTERE AL VISAULIZER DI AVERE IL CONTROLLO
@@ -79,6 +81,9 @@ fn main() {
     /// prima di inviare qualcosa con la cache inserire un delay di circa 100 millisecondi con sleep (potrebbe andare anche con meno, fare test)
     let cache_creation = Cache::new(CACHE_SIZE);
     let cache = Arc::new(Mutex::new(cache_creation));
+
+    let weather_predict_creation = WeatherPredictionTool::new();
+    let weather_predict = Arc::new(Mutex::new(weather_predict_creation));
 
     ///Punto 3
     //let visulizer_map = Arc::clone(&map);
@@ -95,6 +100,7 @@ fn main() {
 
     let mut runner = Runner::new(Box::new(MyRobot{robot: Robot::new()}), &mut map_creation);
 
+
     /// PER FAR PARTIRE IL VISUALIZER SERVE
     ///
     /// CLONE DELLA MAPPA "TOTALE"
@@ -102,7 +108,7 @@ fn main() {
     /// GRANDEZZA DELLA CACHE
     /// RUNNER
     /// QUANTITA' DI TICK DA ELABORARE (INSERIRE -1 PER FAR GIRARE IL RUNNER PER UN QUANTITATIVO INFINITO DI TICK)
-    visualizer::start(map.clone(), visualizer_cache, CACHE_SIZE, runner, TICK_AMOUNT);
+    visualizer::start(map.clone(), visualizer_cache, CACHE_SIZE, runner, TICK_AMOUNT, weather_predict);
 }
 
 

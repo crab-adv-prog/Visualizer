@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::thread::sleep;
+use ohcrab_weather::weather_tool::WeatherPredictionTool;
 
 use rand::Rng;
 use robotics_lib::energy::Energy;
@@ -18,6 +19,8 @@ mod robot_plugin;
 mod tilemap_plugin;
 mod camera_plugin;
 mod devy_debug_plugin;
+mod background_plugin;
+
 
 
 const CACHE_SIZE: usize = 100;
@@ -79,6 +82,9 @@ fn main() {
     let cache_creation = Cache::new(CACHE_SIZE);
     let cache = Arc::new(Mutex::new(cache_creation));
 
+    let weather_predict_creation = WeatherPredictionTool::new();
+    let weather_predict = Arc::new(Mutex::new(weather_predict_creation));
+
     ///Punto 3
     //let visulizer_map = Arc::clone(&map);
     let visualizer_cache = Arc::clone(&cache);
@@ -94,6 +100,7 @@ fn main() {
 
     let mut runner = Runner::new(Box::new(MyRobot{robot: Robot::new()}), &mut map_creation);
 
+
     /// PER FAR PARTIRE IL VISUALIZER SERVE
     ///
     /// CLONE DELLA MAPPA "TOTALE"
@@ -101,7 +108,8 @@ fn main() {
     /// GRANDEZZA DELLA CACHE
     /// RUNNER
     /// QUANTITA' DI TICK DA ELABORARE (INSERIRE -1 PER FAR GIRARE IL RUNNER PER UN QUANTITATIVO INFINITO DI TICK)
-    visualizer::start(map.clone(), visualizer_cache, CACHE_SIZE, runner, TICK_AMOUNT);
+    /// WEATHER_PREDICTER DA SETTUPPARE COME LA CACHE
+    visualizer::start(map.clone(), visualizer_cache, CACHE_SIZE, runner, TICK_AMOUNT, weather_predict);
 }
 
 
