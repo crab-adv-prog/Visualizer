@@ -43,13 +43,13 @@ Inside the runner do: ```cache.add_record(action, coordinates)```
 #### Possible actions:
 
 ```
-cache.add_record("spawn_robot", (x,y)), per spawnare un robot in (x,y)
-cache.add_record("spawn_robot_with_id A", (x,y)), per spawnare un robot in (x,y) con id A
-cache.add_record("move_robot x1 y1", (x,y)), per muovere il robot da (x,y) a (x1,y1)
-cache.add_record("move_robot_multiple A x1 y1", (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
-cache.add_record("destroy_content", (x,y)), per rimuovere il content in (x,y)
-cache.add_record("explore_map x1 y1 x2 y2", (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
-cache.add_record("start_audio 'audio_file_name' x1", (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg a volume x (float positivo)
+cache.add_record(Action::Other("spawn_robot"), (x,y)), per spawnare un robot in (x,y)
+cache.add_record(Action::Other("spawn_robot_with_id A"), (x,y)), per spawnare un robot in (x,y) con id A
+cache.add_record(Action::Other("move_robot x1 y1"), (x,y)), per muovere il robot da (x,y) a (x1,y1)
+cache.add_record(Action::Other("move_robot_multiple A x1 y1"), (x,y)), per muovere il robot situato in (x,y) con id A a (x1,y1)
+cache.add_record(Action::Other("destroy_content"), (x,y)), per rimuovere il content in (x,y)
+cache.add_record(Action::Other("explore_map x1 y1 x2 y2"), (_,_)), per mostrare la mappa nel rettangolo con angoli (x1,y1) in basso a sinistra e (x2,y2) in alto a destra
+cache.add_record(Action::Other("start_audio 'audio_file_name' x1"), (_,_)), per far partire l'audio con nome 'audio_file_name' trovatosi in assets/music/'audio_file_name'.ogg a volume x (float positivo)
 ```
 
 
