@@ -12,6 +12,7 @@ robot_visualizer = { version = "0.3.7", git = "https://github.com/crab-adv-prog/
 ### Setting the visualizer
 
 Create a cache and add it to the robot as a ```Arc<Mutex<Cache>>```
+Do the same for the weather tool
 
 ```toml
     let cache_creation = Cache::new(CACHE_SIZE);
@@ -21,7 +22,7 @@ Create a cache and add it to the robot as a ```Arc<Mutex<Cache>>```
 Start the visualizer giving him the correct variables inside
 
 ```toml
-    visualizer::start(MAP, CACHE, CACHE_SIZE, RUNNER, TICK_AMOUNT);
+    visualizer::start(MAP, CACHE, CACHE_SIZE, RUNNER, TICK_AMOUNT, WEATHER);
 ```
 
 Where:
@@ -35,6 +36,8 @@ Where:
 ```RUNNER``` is the runner that has the robot inside
 
 ```TICK_AMOUNT``` is the amount of ticks that you want your runner to run (```-1``` makes the runner go infinitely)
+
+```WEATHER``` is the weather tool that we seen before (send it with ```Arc::clone(&Weather)```)
 
 ### Sending data to the visualizer
 
